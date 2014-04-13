@@ -1,3 +1,5 @@
+package com.ms.square.plugins.gradle.glsl
+
 import org.gradle.api.Project
 
 class GlslExtension {
@@ -6,7 +8,7 @@ class GlslExtension {
     private String outputPackage
 
     // Output Directory Path
-    private String outputDirPath = "app/src-gen/main/java"
+    private String outputDirPath
 
     GlslExtension(Project project) {
 

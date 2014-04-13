@@ -30,7 +30,7 @@ git add --all .
 git commit -m "Updated at $(date)"
 
 # Push to the gh-pages branch
-git push origin gh-pages
+git push -f origin gh-pages
 
 # Delete the gh-pages directory we used
 cd ..
