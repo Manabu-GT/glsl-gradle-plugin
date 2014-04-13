@@ -1,0 +1,7 @@
+/** Automatically generated file. DO NOT MODIFY */
+package #PACKAGE#;
+
+public final class Glsl {
+    public final static boolean DEBUG = #DEBUG#;
+
+#ADDITIONAL_LINES#}

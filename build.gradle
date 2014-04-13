@@ -1,0 +1,30 @@
+apply plugin: 'groovy'
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+}
+
+apply plugin: 'maven'
+
+group = 'com.ms.square.plugins.gradle'
+version = '0.1'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    includeInJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('repo'))
+        }
+    }
+}
+
+jar {
+}

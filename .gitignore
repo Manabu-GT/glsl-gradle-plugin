@@ -1,0 +1,21 @@
+# Local Configuration Files
+local.properties
+gradle.properties
+
+# Gradle
+.gradle
+build/
+repo
+
+# Android Studio
+*.iml
+!.idea/runConfigurations/*
+.idea/*.xml
+.idea/.name
+.idea/copyright/
+.idea/libraries/
+.idea/scopes/
+.idea/inspectionProfiles/
+
+# Other
+.DS_Store
