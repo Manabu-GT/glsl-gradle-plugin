@@ -6,21 +6,9 @@ class GlslPlugin implements Plugin<Project> {
 
     private final static String TEMPLATE = "Glsl.template";
     private final static String PH_PACKAGE = "#PACKAGE#";
-    private final static String PH_DEBUG = "#DEBUG#";
     private final static String PH_LINES = "#ADDITIONAL_LINES#";
 
-    // Package name for the output
-    def glslOutputPackage = "com.ms.square.glsl"
-
-    // Output package name
-    def glslOutputDirPath = "app/src-gen/main/java"
-
     def glslRawDirPath = "app/src/main/res/raw"
-    //def resOutputDir = getResOutputDir()
-
-//    private void clean() {
-//        delete "../${glslOutputDirPath}"
-//    }
 
     private String readTextFile(File file) {
         StringBuilder result = new StringBuilder();
@@ -62,11 +50,15 @@ class GlslPlugin implements Plugin<Project> {
     private void deleteFromRawFolder(String resDirPath) {
         new File(resDirPath).eachFileMatch("**/raw/.*glsl") { f ->
             f.delete()
+            println "File:" + f.name + " Deleted"
         }
     }
 
     @Override
     void apply(Project project) {
+        // create an extension where the settings reside
+        def extension = project.extensions.create("glslConfig", GlslExtension, project)
+
         project.configure(project) {
             if (it.hasProperty("android")) {
                 tasks.whenTaskAdded { task ->
@@ -93,6 +85,8 @@ class GlslPlugin implements Plugin<Project> {
                                 } else {
                                     packageName = variant.getPackageFromManifest();
                                 }
+
+                                println "PackageName:" + packageName
 
                                 generateGlsl(packageName, getSourceOutputDir().absolutePath)
                                 deleteFromRawFolder(getResOutputDir().absolutePath)

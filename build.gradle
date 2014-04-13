@@ -1,14 +1,10 @@
 apply plugin: 'groovy'
+apply plugin: 'maven'
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
 }
-
-apply plugin: 'maven'
-
-group = 'com.ms.square.plugins.gradle'
-version = '0.1'
 
 repositories {
     mavenCentral()
@@ -18,13 +14,24 @@ configurations {
     includeInJar
 }
 
+def repositoryUrl
+if (has('repoDir')) {
+    repositoryUrl = "file://$repoDir/mvn-repo/"
+} else {
+    repositoryUrl = "file://$buildDir/mvn-repo/"
+}
+
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: uri('repo'))
+            repository(url: repositoryUrl)
+            pom.version = '0.1.0'
+            pom.groupId = 'com.ms.square.plugins.gradle'
+            pom.artifactId = 'glsl-gradle-plugin'
         }
     }
 }
 
 jar {
+    
 }
