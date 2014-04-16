@@ -94,8 +94,10 @@ class GlslPlugin implements Plugin<Project> {
                 tasks.whenTaskAdded { task ->
                     //applicationVariants -> for application project
                     project.("android").applicationVariants.all { variant ->
-                        // locate compileDebugJava and compileReleaseJava tasks
-                        def expectingTask = "compile${variant.name.capitalize()}Java".toString()
+                        // locate processDebugResources and processReleaseResources tasks
+                        def expectingTask = "process${variant.name.capitalize()}Resources".toString()
+
+                        project.logger.debug("BuildType: ${variant.buildType.name}")
 
                         if (expectingTask.equals(task.name)) {
                             def variantName = variant.name
@@ -105,7 +107,10 @@ class GlslPlugin implements Plugin<Project> {
                             project.logger.debug("NewTaskName: ${newTaskName}")
 
                             project.task(newTaskName) << {
-                                String packageName = variant.getPackageName()
+                                String packageName = project.glslConfig.getOutputPackage()
+                                if (!packageName) {
+                                    packageName = variant.getPackageName()
+                                }
                                 String resRawOutputDir =  "$project.buildDir/res/all/${variantData.variantConfiguration.dirName}/raw"
                                 String sourceOutputDir =  "$project.buildDir/source/glsl/${variantData.variantConfiguration.dirName}"
 
@@ -118,8 +123,8 @@ class GlslPlugin implements Plugin<Project> {
                             }
 
                             project.(expectingTask.toString()).dependsOn(newTaskName)
-                            // make it run after generateDebugSources and generateReleaseSources tasks
-                            project.(newTaskName.toString()).mustRunAfter("generate${variant.name.capitalize()}Sources")
+                            // make it run after mergeDebugResources and mergeReleaseResources tasks
+                            project.(newTaskName.toString()).mustRunAfter("merge${variant.name.capitalize()}Resources")
                         }
                     }
                 }
@@ -127,6 +132,8 @@ class GlslPlugin implements Plugin<Project> {
                 // Add generated glsl directory into the source set for compilation
                 project.android.sourceSets.main.java.srcDirs("$project.buildDir/source/glsl")
                 project.logger.debug("android srcDirs: ${project.android.sourceSets.main.java.getSrcDirs()}")
+            } else {
+                throw new IllegalStateException("The 'android' plugin is required.")
             }
         }
     }

@@ -4,11 +4,8 @@ import org.gradle.api.Project
 
 class GlslExtension {
 
-    // Package name for the output
+    // Package name for the generated class (Glsl.java)
     private String outputPackage
-
-    // Output Directory Path
-    private String outputDirPath
 
     GlslExtension(Project project) {
 
@@ -20,13 +17,5 @@ class GlslExtension {
 
     String getOutputPackage() {
         return outputPackage
-    }
-
-    void outputDirPath(String outputDirPath) {
-        this.outputDirPath = outputDirPath
-    }
-
-    String getOutputDirPath() {
-        return outputDirPath
     }
 }

@@ -1,8 +1,15 @@
-Glsl Gradle Plugin
--------------------
+Glsl Gradle Plugin for Android (Beta)
+--------------------------------------
+
+With this plugin, you can place your GLSL codes in android's res/raw folder and access them through the auto-generated
+Java class as a string constant for compilation.
+In addition, this plugin automatically deletes all the *.glsl files under res/raw folder when packaging APKs.
+It should prevent others from reading .glsl files too easily just by unzipping the APKs.
+Of course, note that putting your GLSL code as a string constant in Java class does not completely protect your GLSL codes.
+If you think you need further protection, consider using encryption. (In most cases, this isn't worth your effort.)
 
 Installation
----------
+-------------
 A Glsl Gradle Plugin installation takes only less than 30 seconds. Installation consists of adding the following to your ***build.gradle*** file:
 
  1. Add the Plugin's Maven repository:
@@ -40,7 +47,7 @@ For convenience, here is a snippet of a complete ***build.gradle*** file, includ
 Usage
 -----
 Put your shader code (xxx.glsl) into android's res/raw folder.
-After installing the plugin, all the shader code files under res/raw will be automatically removed from the generated APKs.
+After installing and applying the plugin, all the shader code files under res/raw will be automatically removed from the generated APKs.
 Within the code, you can access your shader codes through the auto-generated Glsl.java file.
 
 For example,
@@ -75,7 +82,17 @@ For example,
                 "}";
     }
 
-By default, Glsl.java belongs to the default package and it's generated under build/source/glsl.
+Note:
+The Glsl.java file will be generated under build/source/glsl directory.
 
 Additional Parameters
 ---------------------
+By default, the Gradle plugin will output Glsl.java under the package name specified in your AndroidManifest.xml.
+However, your can customize this behavior through build.gradle configuration.
+The following example demonstrates how to achieve it.
+
+    android {
+        glslConfig {
+            outputPackage "com.hoge.android.glsl"
+        }
+    }
