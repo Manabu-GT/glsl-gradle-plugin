@@ -96,8 +96,9 @@ class GlslPlugin implements Plugin<Project> {
                     project.("android").applicationVariants.all { variant ->
                         // locate processDebugResources and processReleaseResources tasks
                         def expectingTask = "process${variant.name.capitalize()}Resources".toString()
+                        def buildType = "${variant.buildType.name}"
 
-                        project.logger.debug("BuildType: ${variant.buildType.name}")
+                        project.logger.debug("BuildType: ${buildType}")
 
                         if (expectingTask.equals(task.name)) {
                             def variantName = variant.name
@@ -111,8 +112,8 @@ class GlslPlugin implements Plugin<Project> {
                                 if (!packageName) {
                                     packageName = variant.getPackageName()
                                 }
-                                String resRawOutputDir =  "$project.buildDir/res/all/${variantData.variantConfiguration.dirName}/raw"
-                                String sourceOutputDir =  "$project.buildDir/source/glsl/${variantData.variantConfiguration.dirName}"
+                                String resRawOutputDir = "$project.buildDir/res/all/${variantData.variantConfiguration.dirName}/raw"
+                                String sourceOutputDir = "$project.buildDir/source/glsl/${variantData.variantConfiguration.dirName}"
 
                                 project.logger.debug("PackageName: ${packageName}")
                                 project.logger.debug("ResRawFolder: ${resRawOutputDir}")
@@ -125,13 +126,13 @@ class GlslPlugin implements Plugin<Project> {
                             project.(expectingTask.toString()).dependsOn(newTaskName)
                             // make it run after mergeDebugResources and mergeReleaseResources tasks
                             project.(newTaskName.toString()).mustRunAfter("merge${variant.name.capitalize()}Resources")
+
+                            // Add generated glsl directory into the source set for compilation
+                            project.android.sourceSets.(buildType.toString()).java.srcDirs("$project.buildDir/source/glsl/$buildType")
+                            project.logger.debug("android srcDirs($buildType): ${project.android.sourceSets.(buildType.toString()).java.getSrcDirs()}")
                         }
                     }
                 }
-
-                // Add generated glsl directory into the source set for compilation
-                project.android.sourceSets.main.java.srcDirs("$project.buildDir/source/glsl")
-                project.logger.debug("android srcDirs: ${project.android.sourceSets.main.java.getSrcDirs()}")
             } else {
                 throw new IllegalStateException("The 'android' plugin is required.")
             }

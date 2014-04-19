@@ -1,5 +1,5 @@
-Glsl Gradle Plugin for Android (Beta)
---------------------------------------
+Glsl Gradle Plugin for Android
+-------------------------------
 
 With this plugin, you can place your GLSL codes in android's res/raw folder and access them through the auto-generated
 Java class as a string constant for compilation.
@@ -50,9 +50,13 @@ Put your shader code (xxx.glsl) into android's res/raw folder.
 After installing and applying the plugin, all the shader code files under res/raw will be automatically removed from the generated APKs.
 Within the code, you can access your shader codes through the auto-generated Glsl.java file.
 
-For example,
+Example:
 
     buildProgram(Glsl.PARTICLE_VERTEX_SHADER, Glsl.PARTICLE_FRAGMENT_SHADER);
+
+In the above example, the variable names such as 'PARTICLE_VERTEX_SHADER' are determined solely based on the corresponding glsl file names.
+
+FYI, the auto-generated Glsl.java file will look like the following code.
 
     /** Automatically generated file. DO NOT MODIFY */
     public final class Glsl {
@@ -88,7 +92,7 @@ The Glsl.java file will be generated under build/source/glsl directory.
 Additional Parameters
 ---------------------
 By default, the Gradle plugin will output Glsl.java under the package name specified in your AndroidManifest.xml.
-However, your can customize this behavior through build.gradle configuration.
+However, your can customize this behavior by updating build.gradle.
 The following example demonstrates how to achieve it.
 
     android {
@@ -96,3 +100,6 @@ The following example demonstrates how to achieve it.
             outputPackage "com.hoge.android.glsl"
         }
     }
+
+Since Android Studio gives you an error message on the Editor if the specified package does not already exist,
+the default package name is recommended in most cases.
