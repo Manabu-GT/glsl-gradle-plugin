@@ -30,8 +30,8 @@ class GlslPlugin implements Plugin<Project> {
         return sb.toString()
     }
 
-    private static void generateGlsl(String packageName, String sourceOutputDir, String resOutputDir) {
-        List<File> files = listGlslFromRawFolder(resOutputDir)
+    private static void generateGlsl(String packageName, String sourceOutputPath, String resOutputPath) {
+        List<File> files = listGlslFromRawFolder(resOutputPath)
         Map<String, String> params = Maps.newHashMap()
         params.put(PH_PACKAGE, packageName)
 
@@ -49,7 +49,7 @@ class GlslPlugin implements Plugin<Project> {
                 template = template.replaceAll(entry.getKey(), value)
             }
         }
-        File parent = new File(sourceOutputDir, packageName)
+        File parent = new File(sourceOutputPath, packageName)
         if (!parent.exists()) {
             parent.mkdirs()
         }
@@ -57,16 +57,16 @@ class GlslPlugin implements Plugin<Project> {
         f.write(template)
     }
 
-    private static List<File> listGlslFromRawFolder(String resRawOutputDir) {
+    private static List<File> listGlslFromRawFolder(String resRawOutputPath) {
         List<File> files = new ArrayList<>()
-        new File(resRawOutputDir).eachFileMatch(~/.*\.glsl/) { f ->
+        new File(resRawOutputPath).eachFileMatch(~/.*\.glsl/) { f ->
             files.add(f)
         }
         return files
     }
 
-    private static void deleteFromRawFolder(Project project, String resRawOutputDir) {
-        new File(resRawOutputDir).eachFileMatch(~/.*\.glsl/) { f ->
+    private static void deleteFromRawFolder(Project project, String resRawOutputPath) {
+        new File(resRawOutputPath).eachFileMatch(~/.*\.glsl/) { f ->
             project.logger.debug("Deleting File:${f.name}")
             f.delete()
         }
@@ -112,15 +112,18 @@ class GlslPlugin implements Plugin<Project> {
                                 if (!packageName) {
                                     packageName = variant.getPackageName()
                                 }
-                                String resRawOutputDir = "$project.buildDir/res/all/${variantData.variantConfiguration.dirName}/raw"
-                                String sourceOutputDir = "$project.buildDir/source/glsl/${variantData.variantConfiguration.dirName}"
+                                String resRawOutputPath = "$project.buildDir/res/all/${variantData.variantConfiguration.dirName}/raw"
+                                String sourceOutputPath = "$project.buildDir/source/glsl/${variantData.variantConfiguration.dirName}"
 
                                 project.logger.debug("PackageName: ${packageName}")
-                                project.logger.debug("ResRawFolder: ${resRawOutputDir}")
-                                project.logger.debug("SourceFolder: ${sourceOutputDir}")
+                                project.logger.debug("ResRawFolder: ${resRawOutputPath}")
+                                project.logger.debug("SourceFolder: ${sourceOutputPath}")
 
-                                generateGlsl(packageName, sourceOutputDir, resRawOutputDir)
-                                deleteFromRawFolder(project, resRawOutputDir)
+                                File resRawOutputDir = new File(resRawOutputPath)
+                                if (resRawOutputDir.exists()) {
+                                    generateGlsl(packageName, sourceOutputPath, resRawOutputPath)
+                                    deleteFromRawFolder(project, resRawOutputPath)
+                                }
                             }
 
                             project.(expectingTask.toString()).dependsOn(newTaskName)
