@@ -17,8 +17,6 @@ package com.ms.square.android.opengl.sample;
 
 import android.opengl.GLES20;
 
-import com.ms.square.android.opengl.sample.MyGLRenderer;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -28,24 +26,24 @@ import java.nio.FloatBuffer;
  */
 public class Triangle {
 
-    private final String vertexShaderCode =
-            // This matrix member variable provides a hook to manipulate
-            // the coordinates of the objects that use this vertex shader
-            "uniform mat4 uMVPMatrix;" +
-            "attribute vec4 vPosition;" +
-            "void main() {" +
-            // the matrix must be included as a modifier of gl_Position
-            // Note that the uMVPMatrix factor *must be first* in order
-            // for the matrix multiplication product to be correct.
-            "  gl_Position = uMVPMatrix * vPosition;" +
-            "}";
-
-    private final String fragmentShaderCode =
-            "precision mediump float;" +
-            "uniform vec4 vColor;" +
-            "void main() {" +
-            "  gl_FragColor = vColor;" +
-            "}";
+//    private final String vertexShaderCode =
+//            // This matrix member variable provides a hook to manipulate
+//            // the coordinates of the objects that use this vertex shader
+//            "uniform mat4 uMVPMatrix;" +
+//            "attribute vec4 vPosition;" +
+//            "void main() {" +
+//            // the matrix must be included as a modifier of gl_Position
+//            // Note that the uMVPMatrix factor *must be first* in order
+//            // for the matrix multiplication product to be correct.
+//            "  gl_Position = uMVPMatrix * vPosition;" +
+//            "}";
+//
+//    private final String fragmentShaderCode =
+//            "precision mediump float;" +
+//            "uniform vec4 vColor;" +
+//            "void main() {" +
+//            "  gl_FragColor = vColor;" +
+//            "}";
 
     private final FloatBuffer vertexBuffer;
     private final int mProgram;
@@ -84,11 +82,19 @@ public class Triangle {
         // set the buffer to read the first coordinate
         vertexBuffer.position(0);
 
+//        // prepare shaders and OpenGL program
+//        int vertexShader = MyGLRenderer.loadShader(
+//                GLES20.GL_VERTEX_SHADER, vertexShaderCode);
+//        int fragmentShader = MyGLRenderer.loadShader(
+//                GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+
         // prepare shaders and OpenGL program
         int vertexShader = MyGLRenderer.loadShader(
-                GLES20.GL_VERTEX_SHADER, vertexShaderCode);
+                GLES20.GL_VERTEX_SHADER,
+                com.ms.square.android.opengl.sample.Glsl.TRIANGLE_VERTEX_SHADER);
         int fragmentShader = MyGLRenderer.loadShader(
-                GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+                GLES20.GL_FRAGMENT_SHADER,
+                com.ms.square.android.opengl.sample.Glsl.TRIANGLE_FRAGMENT_SHADER);
 
         mProgram = GLES20.glCreateProgram();             // create empty OpenGL Program
         GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
