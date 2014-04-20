@@ -18,6 +18,7 @@ PAGES_DIR=$PWD
 git checkout --orphan gh-pages
 rm -rf .gitignore
 rm -rf .gitmodules
+rm -rf .travis.yml
 rm -rf *
 
 # Create an aar and place it in the gh-pages branch
