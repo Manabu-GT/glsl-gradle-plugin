@@ -1,4 +1,4 @@
-Glsl Gradle Plugin for Android
+Glsl Gradle Plugin for Android [![Build Status](https://travis-ci.org/Manabu-GT/glsl-gradle-plugin.png?branch=master)](https://travis-ci.org/Manabu-GT/glsl-gradle-plugin)
 -------------------------------
 
 With this plugin, you can place your GLSL codes in android's res/raw folder and access them through the auto-generated
