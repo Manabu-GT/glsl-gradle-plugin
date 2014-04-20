@@ -18,7 +18,7 @@ A Glsl Gradle Plugin installation takes only less than 30 seconds. Installation 
 
  2. Add plugin dependency:
 
-        classpath 'com.ms.square.plugins.gradle:glsl-gradle-plugin:0.1.0'
+        classpath 'com.ms.square:glsl-gradle-plugin:0.1.0'
 
  3. Apply plugin:
 
