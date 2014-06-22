@@ -3,6 +3,7 @@ package com.ms.square.plugins.gradle.glsl
 import com.google.common.collect.Maps
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.ProjectConfigurationException
 
 class GlslPlugin implements Plugin<Project> {
 
@@ -49,11 +50,13 @@ class GlslPlugin implements Plugin<Project> {
                 template = template.replaceAll(entry.getKey(), value)
             }
         }
-        File parent = new File(sourceOutputPath, packageName)
-        if (!parent.exists()) {
-            parent.mkdirs()
+
+        File pkgFolder = new File(sourceOutputPath, packageName.replaceAll("\\.", File.separator));
+        if (!pkgFolder.exists()) {
+            pkgFolder.mkdirs();
         }
-        File f = new File(parent, GLSL_FILENAME)
+
+        File f = new File(pkgFolder, GLSL_FILENAME)
         f.write(template)
     }
 
@@ -87,57 +90,67 @@ class GlslPlugin implements Plugin<Project> {
         def extension = project.extensions.create("glslConfig", GlslExtension, project)
 
         project.configure(project) {
-            if (it.hasProperty("android")) {
 
-                project.logger.debug("BuildDir: ${project.buildDir}")
+            def variants = null;
+            if (project.plugins.findPlugin("android")) {
+                //applicationVariants -> for application project
+                variants = "applicationVariants";
+            } else if (project.plugins.findPlugin("android-library")) {
+                //libraryVariants -> for library project
+                variants = "libraryVariants";
+            } else {
+                throw new ProjectConfigurationException("The android or android-library plugin must be applied to the project", null)
+            }
 
-                tasks.whenTaskAdded { task ->
-                    //applicationVariants -> for application project
-                    project.("android").applicationVariants.all { variant ->
-                        // locate processDebugResources and processReleaseResources tasks
-                        def expectingTask = "process${variant.name.capitalize()}Resources".toString()
-                        def buildType = "${variant.buildType.name}"
+            project.logger.debug("BuildDir: ${project.buildDir}")
 
-                        project.logger.debug("BuildType: ${buildType}")
+            tasks.whenTaskAdded { task ->
 
-                        if (expectingTask.equals(task.name)) {
-                            def variantName = variant.name
-                            // create new task with name such as glslRelease and glslDebug
-                            def newTaskName = "glsl${variantName.capitalize()}"
+                project.android[variants].all { variant ->
+                    // locate processDebugResources and processReleaseResources tasks
+                    def expectingTask = "process${variant.name.capitalize()}Resources".toString()
+                    def buildType = "${variant.buildType.name}"
 
-                            project.logger.debug("NewTaskName: ${newTaskName}")
+                    project.logger.debug("BuildType: ${buildType}")
 
-                            project.task(newTaskName) << {
-                                String packageName = project.glslConfig.getOutputPackage()
-                                if (!packageName) {
-                                    packageName = variant.getPackageName()
-                                }
-                                String resRawOutputPath = "$project.buildDir/res/all/${variantData.variantConfiguration.dirName}/raw"
-                                String sourceOutputPath = "$project.buildDir/source/glsl/${variantData.variantConfiguration.dirName}"
+                    if (expectingTask.equals(task.name)) {
+                        def variantName = variant.name
+                        // create new task with name such as glslRelease and glslDebug
+                        def newTaskName = "glsl${variantName.capitalize()}"
 
-                                project.logger.debug("PackageName: ${packageName}")
-                                project.logger.debug("ResRawFolder: ${resRawOutputPath}")
-                                project.logger.debug("SourceFolder: ${sourceOutputPath}")
+                        project.logger.debug("NewTaskName: ${newTaskName}")
 
-                                File resRawOutputDir = new File(resRawOutputPath)
-                                if (resRawOutputDir.exists()) {
-                                    generateGlsl(packageName, sourceOutputPath, resRawOutputPath)
-                                    deleteFromRawFolder(project, resRawOutputPath)
-                                }
+                        project.task(newTaskName) << {
+                            String packageName = project.glslConfig.getOutputPackage()
+                            if (!packageName) {
+                                packageName = variant.getPackageName()
                             }
 
-                            project.(expectingTask.toString()).dependsOn(newTaskName)
-                            // make it run after mergeDebugResources and mergeReleaseResources tasks
-                            project.(newTaskName.toString()).mustRunAfter("merge${variant.name.capitalize()}Resources")
+                            String resRawOutputPath = "$project.buildDir/intermediates/res/${variantData.variantConfiguration.dirName}/raw"
+                            String sourceOutputPath = "$project.buildDir/generated/source/glsl/${variantData.variantConfiguration.dirName}"
 
-                            // Add generated glsl directory into the source set for compilation
-                            project.android.sourceSets.(buildType.toString()).java.srcDirs("$project.buildDir/source/glsl/$buildType")
-                            project.logger.debug("android srcDirs($buildType): ${project.android.sourceSets.(buildType.toString()).java.getSrcDirs()}")
+                            variant.javaCompile.options.compilerArgs += [
+                                    '-sourcepath', new File(sourceOutputPath)
+                            ]
+
+                            project.logger.debug("PackageName: ${packageName}")
+                            project.logger.debug("ResRawFolder: ${resRawOutputPath}")
+                            project.logger.debug("SourceFolder: ${sourceOutputPath}")
+
+                            File resRawOutputDir = new File(resRawOutputPath)
+                            if (resRawOutputDir.exists()) {
+                                generateGlsl(packageName, sourceOutputPath, resRawOutputPath)
+                                deleteFromRawFolder(project, resRawOutputPath)
+                            } else {
+                                project.logger.warn("ResRawFolder not found: ${resRawOutputPath}")
+                            }
                         }
+
+                        project.(expectingTask.toString()).dependsOn(newTaskName)
+                        // make it run after mergeDebugResources and mergeReleaseResources tasks
+                        project.(newTaskName.toString()).mustRunAfter("merge${variant.name.capitalize()}Resources")
                     }
                 }
-            } else {
-                throw new IllegalStateException("The 'android' plugin is required.")
             }
         }
     }
