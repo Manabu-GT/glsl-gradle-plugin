@@ -10,7 +10,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.11.+'
-        classpath 'com.ms.square:glsl-gradle-plugin:0.1.0'
+        classpath 'com.ms-square:glsl-gradle-plugin:0.1.1'
     }
 }
 
