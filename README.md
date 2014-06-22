@@ -8,6 +8,10 @@ It should prevent others from reading .glsl files too easily just by unzipping t
 Of course, note that putting your GLSL code as a string constant in Java class does not completely protect your GLSL codes.
 If you think you need further protection, consider using encryption. (In most cases, this isn't worth your effort.)
 
+Compatibility
+-------------
+Currently known to work with Gradle 1.12, Android Gradle Plugin 0.11.x, and Android Studio 0.6.x
+
 Installation
 -------------
 A Glsl Gradle Plugin installation takes only less than 30 seconds. Installation consists of adding the following to your ***build.gradle*** file:
@@ -18,7 +22,7 @@ A Glsl Gradle Plugin installation takes only less than 30 seconds. Installation 
 
  2. Add plugin dependency:
 
-        classpath 'com.ms.square:glsl-gradle-plugin:0.1.0'
+        classpath 'com.ms-square:glsl-gradle-plugin:0.1.1'
 
  3. Apply plugin:
 
@@ -35,8 +39,8 @@ For convenience, here is a snippet of a complete ***build.gradle*** file, includ
         }
 
         dependencies {
-            classpath 'com.android.tools.build:gradle:0.9.+'
-            classpath 'com.ms.square.plugins.gradle:glsl-gradle-plugin:0.1.0'
+            classpath 'com.android.tools.build:gradle:0.11.+'
+            classpath 'com.ms-square:glsl-gradle-plugin:0.1.1'
         }
     }
 
@@ -87,7 +91,7 @@ FYI, the auto-generated Glsl.java file will look like the following code.
     }
 
 Note:
-The Glsl.java file will be generated under build/source/glsl directory.
+The Glsl.java file will be generated under build/generated/source/glsl directory.
 
 Additional Parameters
 ---------------------
